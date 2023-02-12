@@ -1,3 +1,4 @@
 environs[django]==9.5.0
 django==3.2.*
 psycopg2-binary==2.9.5
+stripe==5.1.1

@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <title>Купить {{ item.name }}</title>
+    </head>
+    <body>
+        <h2>{{ item.name }}</h2>
+        <p>{{ item.description }}</p>
+        <p>{{ item.price }}</p>
+        <form action="{% url 'create_checkout_session' item.id %}" method="get">
+            <button type="submit">Checkout</button>
+        </form>
+    </body>
+</html>
