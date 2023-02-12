@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404, redirect
 import stripe
@@ -24,14 +24,13 @@ def create_checkout_session(request, pk):
         session = stripe.checkout.Session.create(
             line_items=[
                 {
-                    'price': item.price,
+                    'price': item.stripe_price_id,
                     'quantity': 1,
                 }
             ],
             mode='payment',
-            success_url='http://localhost:8000/',
+            success_url='http://localhost:8000/success',
             cancel_url=f'http://localhost:8000/item/{item.pk}/'
         )
         return redirect(session.url)
-    return HttpResponse('error')
-
+    return JsonResponse({'error': 'error'})

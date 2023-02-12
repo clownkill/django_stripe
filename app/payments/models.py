@@ -12,7 +12,6 @@ class Item(models.Model):
     stripe_product_id = models.CharField(max_length=150, blank=True)
     stripe_price_id = models.CharField(max_length=150, blank=True)
 
-
     class Meta:
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
@@ -24,17 +23,22 @@ class Item(models.Model):
 @receiver(signals.pre_save, sender=Item)
 def create_item(sender, instance, **kwargs):
     stripe.api_key = settings.STRIPE_SECRET_KEY
-    product = stripe.Product.create(
-        active=True,
-        name=instance.name,
-        description=instance.description,
-    )
+
+    if not instance.stripe_product_id:
+        product = stripe.Product.create(
+            active=True,
+            name=instance.name,
+            description=instance.description,
+        )
+        product_id = product['id']
+    else:
+        product_id = instance.stripe_product_id
 
     price = stripe.Price.create(
-        product=product['id'],
+        product=product_id,
         unit_amount=int(instance.price * 100),
         currency='usd'
     )
 
-    instance.stripe_product_id = product['id']
+    instance.stripe_product_id = product_id
     instance.stripe_price_id = price['id']
