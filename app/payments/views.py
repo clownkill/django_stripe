@@ -20,17 +20,21 @@ class ItemDetailView(DetailView):
 def create_checkout_session(request, pk):
     if request.method == 'GET':
         item = get_object_or_404(Item, pk=pk)
+
+        domain_url = 'http://localhost:8000/'
         stripe.api_key = settings.STRIPE_SECRET_KEY
-        session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    'price': item.stripe_price_id,
-                    'quantity': 1,
-                }
-            ],
-            mode='payment',
-            success_url='http://localhost:8000/success',
-            cancel_url=f'http://localhost:8000/item/{item.pk}/'
-        )
-        return redirect(session.url)
-    return JsonResponse({'error': 'error'})
+        try:
+            session = stripe.checkout.Session.create(
+                line_items=[
+                    {
+                        'price': item.stripe_price_id,
+                        'quantity': 1,
+                    }
+                ],
+                mode='payment',
+                success_url=f'{domain_url}success',
+                cancel_url=f'{domain_url}item/{item.pk}/'
+            )
+            return JsonResponse({'session_id': session['id']})
+        except Exception as e:
+            return JsonResponse({'error': str(e)})
