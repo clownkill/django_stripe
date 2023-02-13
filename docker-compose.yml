@@ -19,10 +19,8 @@ services:
     image: postgres:14.6-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=django_stripe
-      - POSTGRES_PASSWORD=django_stripe
-      - POSTGRES_DB=django_stripe_dev
+    env_file:
+      - ./.env.db
 
 
   nginx:
