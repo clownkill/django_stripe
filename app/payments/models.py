@@ -6,6 +6,17 @@ from django.dispatch import receiver
 from django.core.validators import MinValueValidator, MaxValueValidator
 import stripe
 
+CURRENCY_CHOICES = (
+    ('rub', 'Рубль'),
+    ('eur', 'Евро'),
+    ('usd', 'Доллар'),
+)
+
+EXCHANGE_RATE = {
+    'rub': 60,
+    'eur': 0.9
+}
+
 
 class Item(models.Model):
 
@@ -14,6 +25,12 @@ class Item(models.Model):
     price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
     stripe_product_id = models.CharField(max_length=150, blank=True)
     stripe_price_id = models.CharField(max_length=150, blank=True)
+    currency = models.CharField(
+        'Валюта',
+        max_length=3,
+        choices=CURRENCY_CHOICES,
+        default='usd'
+    )
 
     class Meta:
         verbose_name = 'Товар'
@@ -21,6 +38,11 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_item_price(self):
+        if self.currency == 'usd':
+            return self.price
+        return self.price * EXCHANGE_RATE[self.currency]
 
 
 class Tax(models.Model):

@@ -27,7 +27,11 @@ def create_checkout_session(request, pk):
             session = stripe.checkout.Session.create(
                 line_items=[
                     {
-                        'price': item.stripe_price_id,
+                        'price_data': {
+                            'currency': item.currency,
+                            'product_data': {'name': item.name},
+                            'unit_amount': int(item.get_item_price() * 100),
+                        },
                         'quantity': 1,
                     }
                 ],

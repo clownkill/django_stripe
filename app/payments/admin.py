@@ -9,7 +9,26 @@ class ItemAdmin(admin.ModelAdmin):
         'name',
         'description',
         'price',
+        'currency'
     ]
+    readonly_fields = [
+        'stripe_product_id',
+        'stripe_price_id',
+    ]
+    fieldsets = (
+        (
+            None,
+            {
+                'fields': (
+                    'name',
+                    'description',
+                    ('price', 'currency'),
+                    'stripe_product_id',
+                    'stripe_price_id',
+                ),
+            },
+        ),
+    )
 
 
 @admin.register(Tax)
